@@ -52,12 +52,13 @@ API_KEY= None
 API_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
+# BUSINESS_PATH = '/v3/businesses/matches/'  # Business ID will come after slash.
 
 
 # Defaults for our simple example.
-DEFAULT_TERM = 'dinner'
-DEFAULT_LOCATION = 'San Francisco, CA'
-SEARCH_LIMIT = 3
+DEFAULT_TERM = 'brunch'
+DEFAULT_LOCATION = 'Tempe, AZ'
+SEARCH_LIMIT = 10
 
 
 def request(host, path, api_key, url_params=None):
@@ -102,6 +103,7 @@ def search(api_key, term, location):
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
+        'match_threshold': None,
         'limit': SEARCH_LIMIT
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
@@ -136,6 +138,10 @@ def query_api(term, location):
         print(u'No businesses for {0} in {1} found.'.format(term, location))
         return
 
+    #add'l code to print out business ids
+    for b in businesses: 
+        print(b['name'])
+
     business_id = businesses[0]['id']
 
     print(u'{0} businesses found, querying business info ' \
@@ -159,6 +165,9 @@ def main():
     input_values = parser.parse_args()
 
     try:
+        print('---------')
+        print('{} in {}'.format(input_values.term, input_values.location))
+        print('---------')
         query_api(input_values.term, input_values.location)
     except HTTPError as error:
         sys.exit(
